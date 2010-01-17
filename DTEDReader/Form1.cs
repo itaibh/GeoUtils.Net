@@ -192,26 +192,34 @@ namespace DTEDReader
                         }
                     }
 
+                    bool inside = false;
                     for (int y = 1; y <= tileHeight; ++y)
                     {
                         for (int x = 1; x <= tileWidth; ++x)
                         {
                             if (visitMask[y, x])
+                            {
+                                inside = true;
                                 continue;
+                            }
 
                             int value = data[y, x];
-                            if (value >= h)
+                            if (value < h)
+                                inside = false;
+                            else if (!inside)
                             {
                                 counter++;
-                                if (counter == 5)
+                                if (counter == 7)
                                     return;
                                 List<Point> vector = TryTrace(data, visitMask, g, x, y, h);
                                 if (vector.Count == 1)
                                 {
-                                    g.DrawEllipse(Pens.SteelBlue, vector[0].X, vector[0].Y, PixelSize, PixelSize);
+                                    g.DrawEllipse(Pens.Blue, vector[0].X, vector[0].Y, PixelSize, PixelSize);
                                 }
-                                if (vector.Count>2)
-                                    g.DrawPolygon(Pens.SteelBlue, vector.ToArray());
+                                if (vector.Count > 2)
+                                    g.DrawPolygon(Pens.Blue, vector.ToArray());
+
+                                inside = true;
                             }
                         }
                     }
@@ -247,7 +255,7 @@ namespace DTEDReader
                 FindNextPixel(data, visitMask, h, nextX, nextY, dir, out nextX, out nextY, out nextDir);
             } while ((nextX != x || nextY != y) && (nextX != firstX || nextY != firstY));
 
-            FillVisitMaskByStrides(strides, data, visitMask, h);
+            //FillVisitMaskByStrides(strides, data, visitMask, h);
 
             return vector;
         }
